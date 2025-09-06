@@ -19,7 +19,7 @@ const { images, columns = 3, height = 'auto' } = Astro.props;
       <div class="masonry-item">
         {image.src.startsWith('/') ? (
           <img
-            src={image.src}
+            src={import.meta.env.BASE_URL + image.src.slice(1)}
             alt={image.alt}
             class="gallery-image cursor-pointer rounded-md hover:opacity-90 transition-opacity"
             data-index={index}
