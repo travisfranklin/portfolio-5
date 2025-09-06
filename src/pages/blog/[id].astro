@@ -64,7 +64,7 @@ if (seo?.image?.src) {
                 featureImage?.src && (
                     <figure class="mx-auto my-6 sm:my-8 lg:my-12">
                         {featureImage.src.startsWith('/') ? (
-                            <img class="w-full rounded-lg" src={import.meta.env.BASE_URL + featureImage.src.slice(1)} loading="lazy" decoding="async" alt={featureImage.alt || ''} />
+                            <img class="w-full rounded-lg" src={import.meta.env.BASE_URL.replace(/\/$/, '') + featureImage.src} loading="lazy" decoding="async" alt={featureImage.alt || ''} />
                         ) : (
                             <Image class="w-full rounded-lg" src={featureImage.src} loading="lazy" decoding="async" alt={featureImage.alt || ''} inferSize />
                         )}

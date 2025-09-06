@@ -14,7 +14,7 @@ const socialLinks = siteConfig.socialLinks || [];
     {
         siteConfig.logo && siteConfig.logo?.src ? (
             <a href="/">
-                <img class="max-h-12 text-primary" src={siteConfig.logo.src.startsWith('/') ? import.meta.env.BASE_URL + siteConfig.logo.src.slice(1) : siteConfig.logo.src} alt={siteConfig.logo.alt || ''} />
+                <img class="max-h-12 text-primary" src={siteConfig.logo.src.startsWith('/') ? import.meta.env.BASE_URL.replace(/\/$/, '') + siteConfig.logo.src : siteConfig.logo.src} alt={siteConfig.logo.alt || ''} />
             </a>
         ) : (
             <a class="text-xl font-bold sm:text-2xl" href="/">
