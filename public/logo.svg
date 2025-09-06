@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="950px" height="950px" viewBox="0 0 524 509" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Logo</title>
+    <desc>TF Logo</desc>
+    <g id="Artboard" stroke="none" stroke-width="1" fill="#ffdd57" fill-rule="evenodd">
+        <g id="TF-2" fill="#ffdd57" fill-rule="nonzero">
+            <path d="M124.376068,76.7226891 L0,76.7226891 L0,0 L340,0 L340,76.7226891 L215.623932,76.7226891 L215.623932,415 L124.376068,415 L124.376068,76.7226891 Z M233,94 L524,94 L524,170.722689 L324.00996,170.722689 L324.00996,266.62605 L497.334661,266.62605 L497.334661,337.536415 L324.00996,337.536415 L324.00996,509 L233,509 L233,94 Z" id="TF"></path>
+        </g>
+    </g>
+</svg>

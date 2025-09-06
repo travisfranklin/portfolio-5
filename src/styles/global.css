@@ -1,0 +1,56 @@
+@import '@fontsource-variable/figtree' layer(base);
+@import '@fontsource-variable/figtree/wght-italic.css' layer(base);
+
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@theme {
+    --font-sans: "DIN", Helvetica Neue, Helvetica, Arial, sans-serif;
+    --font-body: var(--font-sans);
+    --font-code: "BerkeleyMono", monospace;
+    --color-primary: #ffdd57;
+    --shadow-avatar: 0 0 1px 11px --alpha(var(--color-primary) / 15%), 0 0 1px 22px --alpha(var(--color-primary) / 10%);
+    --shadow-button: 0 0 1px 6px --alpha(var(--color-primary) / 17.5%);
+    --hex-bg-0: #232425;
+    --hex-bg-1: #232425;
+    --hex-bg-2: #28292a;
+    --hex-bg-3: #2d2e2f;
+    --hex-bg-4: #38393a;
+    --hex-fg-0: #FFFFFF;
+    --hex-fg-1: #e6e6e6;
+    --hex-fg-2: #cdcbcb;
+    --hex-fg-3: #9b9797;
+    --hex-fg-4: #696363;
+    --backgroundColor: var(--hex-bg-1);
+    --visual-viewport-height: 100dvh;
+    --tw-prose-body: var(--hex-fg-0);
+    --tw-prose-headings: var(--hex-fg-0);
+}
+
+@layer utilities {
+    .prose {
+        @apply text-white;
+    }
+
+    .prose {
+        h1, h2, h3, h4, h5, h6 {
+            @apply text-white;
+        }
+    }
+    .prose a {
+        @apply text-primary underline decoration-1 underline-offset-2 hover:no-underline;
+    }
+    .prose blockquote {
+        @apply relative font-semibold not-italic border-none pl-0 text-[1.375em] leading-snug text-center sm:text-[1.66667em] lg:-mx-24 xl:-mx-40;
+    }
+    .prose blockquote:before {
+        @apply block w-15 h-0.75 mx-auto bg-primary;
+        content: '';
+        margin-bottom: 1.375em;
+    }
+    .prose blockquote:after {
+        @apply block w-7.5 h-0.75 mx-auto bg-primary;
+        content: '';
+        margin-top: 1.375em;
+    }
+}

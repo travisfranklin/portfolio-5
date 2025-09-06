@@ -1,0 +1,57 @@
+---
+import { Image } from 'astro:assets';
+import { type CollectionEntry } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+
+const { post } = Astro.props as { post: CollectionEntry<'blog'> };
+const { title, publishDate, updatedDate, featureImage, excerpt } = post.data;
+---
+
+<article class="mb-12 sm:mb-16">
+    <header class="max-w-3xl mx-auto">
+        <div class="mb-2 text-sm uppercase tracking-wider sm:mb-3">
+            <span class="text-primary">Featured</span>
+            {' / '}
+            <FormattedDate date={publishDate} />
+            {
+                updatedDate && (
+                    <>
+                        {' '}
+                        <span>
+                            (Updated on <FormattedDate date={updatedDate} />)
+                        </span>
+                    </>
+                )
+            }
+        </div>
+        <h2 class="text-3xl font-bold sm:text-4xl md:text-5xl"><a href={`/blog/${post.id}/`}>{title}</a></h2>
+    </header>
+    {
+        featureImage?.src && (
+            <figure class="mx-auto my-6 sm:my-8">
+                <a href={`/blog/${post.id}/`}>
+                    {featureImage.src.startsWith('/') ? (
+                        <img class="w-full rounded-md" src={featureImage.src} loading="lazy" decoding="async" alt={featureImage.alt || ''} />
+                    ) : (
+                        <Image class="w-full rounded-md" src={featureImage.src} loading="lazy" decoding="async" alt={featureImage.alt || ''} inferSize />
+                    )}
+                </a>
+            </figure>
+        )
+    }
+    {
+        excerpt && (
+            <div class="max-w-3xl mx-auto mt-6">
+                <div class="prose sm:prose-lg max-w-none">{excerpt}</div>
+            </div>
+        )
+    }
+    <div class="max-w-3xl mx-auto mt-2">
+        <a
+            class="inline-flex justify-center items-center align-right gap-1.5 py-1 font-bold transition duration-100 hover:text-primary"
+            href={`/blog/${post.id}/`}
+        >
+            continue reading ›››
+        </a>
+    </div>
+</article>

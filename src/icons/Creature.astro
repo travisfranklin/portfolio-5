@@ -1,0 +1,32 @@
+---
+const { class: className } = Astro.props;
+---
+
+<!-- Creature toggle icon - represents a stylized creature/organism -->
+<svg
+    class={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <!-- Central core -->
+    <circle cx="12" cy="12" r="4" fill="currentColor" opacity="0.8"/>
+
+    <!-- Surrounding particles/parts -->
+    <circle cx="6" cy="6" r="2.5" fill="currentColor" opacity="0.6"/>
+    <circle cx="18" cy="6" r="2.5" fill="currentColor" opacity="0.6"/>
+    <circle cx="6" cy="18" r="2.5" fill="currentColor" opacity="0.6"/>
+    <circle cx="18" cy="18" r="2.5" fill="currentColor" opacity="0.6"/>
+
+    <!-- Outer particles -->
+    <circle cx="3" cy="12" r="2" fill="currentColor" opacity="0.4"/>
+    <circle cx="21" cy="12" r="2" fill="currentColor" opacity="0.4"/>
+    <circle cx="12" cy="3" r="2" fill="currentColor" opacity="0.4"/>
+    <circle cx="12" cy="21" r="2" fill="currentColor" opacity="0.4"/>
+
+    <!-- Corner particles -->
+    <circle cx="1.5" cy="1.5" r="1.5" fill="currentColor" opacity="0.3"/>
+    <circle cx="22.5" cy="1.5" r="1.5" fill="currentColor" opacity="0.3"/>
+    <circle cx="1.5" cy="22.5" r="1.5" fill="currentColor" opacity="0.3"/>
+    <circle cx="22.5" cy="22.5" r="1.5" fill="currentColor" opacity="0.3"/>
+</svg>

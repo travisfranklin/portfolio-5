@@ -1,0 +1,285 @@
+<script>
+    import { animate, createTimeline, createTimer, stagger, utils } from 'animeJs';
+
+    const creatureEl = document.querySelector<HTMLElement>('#creature');
+    const creatureViewer = document.querySelector<HTMLElement>('#creature-viewer');
+
+    if (!creatureEl) throw new Error('Missing #creature element');
+    if (!creatureViewer) throw new Error('Missing #creature-viewer element');
+
+    const viewport = { w: window.innerWidth, h: window.innerHeight };
+    const cursor = { x: viewport.w / 2, y: 0 };
+    const rows = 13;
+    const grid: [number, number] = [rows, rows];
+    const from = 'center';
+
+    const scaleStagger = stagger([2, 8], { ease: 'inQuad', grid, from });
+    const opacityStagger = stagger([1, 0.1], { grid, from });
+
+    for (let i = 0; i < rows * rows; i++) {
+        const creatureChild = document.createElement('div')
+        creatureChild.classList.add('creature-part');
+        creatureEl.appendChild(creatureChild);
+    }
+
+    const particleDivs = creatureEl.querySelectorAll<HTMLDivElement>('.creature-part');
+    if (particleDivs.length === 0) throw new Error('No particles created');
+
+    utils.set(creatureEl, {
+        width: `${rows * 10}em`,
+        height: `${rows * 10}em`,
+    });
+
+    utils.set(particleDivs, {
+        x: viewport.w / 2,
+        y: 0,
+        scale: scaleStagger,
+        opacity: opacityStagger,
+        background: stagger([80, 20], {
+            grid,
+            from,
+            modifier: (tweenModifierValue: number): string => `hsl(48, 100%, ${tweenModifierValue}%)`,
+        }),
+        boxShadow: stagger([8, 1], {
+            grid,
+            from,
+            modifier: (tweenModifierValue: number): string => `0px 0px ${utils.round(tweenModifierValue, 0)}em 0px var(--color-primary)`,
+        }),
+        zIndex: stagger([rows * rows, 1], {
+            grid,
+            from,
+            modifier: (tweenModifierValue: number): number => utils.round(tweenModifierValue, 0),
+        }),
+    });
+
+    let currentPulseAnimation: any = null;
+
+    const pulse = (): void => {
+        if (!resting) {
+            currentPulseAnimation = animate(particleDivs, {
+                keyframes: [
+                    {
+                        scale: 9,
+                        opacity: 1,
+                        delay: stagger(90, { start: 1650, grid, from }),
+                        background: stagger([80, 20], {
+                            grid,
+                            from,
+                            modifier: (tweenModifierValue: number): string => `hsl(48, 100%, ${tweenModifierValue}%)`,
+                        }),
+                        duration: 150,
+                    },
+                    {
+                        scale: scaleStagger,
+                        opacity: opacityStagger,
+                        ease: 'inOutQuad',
+                        duration: 400,
+                    },
+                ],
+                onComplete: (): void => {
+                    currentPulseAnimation = null;
+                    // If resting was set during animation, apply resting state now
+                    if (resting) {
+                        applyRestingVisuals();
+                    }
+                },
+                onPause: (): void => {},
+            });
+        }
+    };
+
+    const mainLoop = createTimer({
+        frameRate: 12,
+        onUpdate: (): void => {
+            animate(particleDivs, {
+                x: cursor.x,
+                y: cursor.y,
+                delay: stagger(40, { grid, from }),
+                duration: stagger(120, { start: 1200, ease: 'inQuad', grid, from }),
+                ease: 'inOut',
+                composition: 'blend',
+            });
+        },
+    });
+
+
+    const autoMove = createTimeline()
+        .add(cursor, {
+            x: [viewport.w * 0.3, viewport.w * 0.7],
+            modifier: x => x + Math.sin(mainLoop.currentTime * .0000003) * viewport.w * 0.2,
+            duration: 6000,
+            ease: 'inOutSine',
+            alternate: true,
+            loop: true,
+            onBegin: pulse,
+            onLoop: pulse,
+            scale: scaleStagger,
+            opacity: opacityStagger,
+            background: stagger([80, 20], {
+                grid,
+                from,
+                modifier: (tweenModifierValue: number): string => `hsl(48, 100%, ${tweenModifierValue}%)`,
+            }),
+            boxShadow: stagger([8, 1], {
+                grid,
+                from,
+                modifier: (tweenModifierValue: number): string => `0px 0px ${utils.round(tweenModifierValue, 0)}em 0px var(--color-primary)`,
+            }),
+            zIndex: stagger([rows * rows, 1], {
+                grid,
+                from,
+                modifier: (tweenModifierValue: number): number => utils.round(tweenModifierValue, 0),
+            }),
+        }, 0)
+        .add(cursor, {
+            y: [viewport.h * 0.25, viewport.h * 0.75],
+            modifier: y => y + Math.cos(mainLoop.currentTime * .00006) * viewport.h * .25,
+            duration: 4000,
+            ease: 'inOutQuad',
+            alternate: true,
+            loop: true,
+            background: stagger([80, 20], {
+                grid,
+                from,
+                modifier: (tweenModifierValue: number): string => `hsl(48, 100%, ${tweenModifierValue}%)`,
+            }),
+        }, 0);
+
+    const manualMovementTimeout = createTimer({
+        duration: 1500,
+        onComplete: (): void => { autoMove.play() },
+    });
+
+    const followPointer = (e: MouseEvent | TouchEvent): void => {
+        if (e.type === 'touchmove') {
+            const touch = (e as TouchEvent).touches[0];
+            if (!touch) return;
+            cursor.x = touch.clientX; // Use clientX instead of pageX
+            cursor.y = touch.clientY; // Use clientY instead of pageY
+        } else {
+            const mouseEvent = e as MouseEvent;
+            cursor.x = mouseEvent.clientX; // Use clientX instead of pageX
+            cursor.y = mouseEvent.clientY; // Use clientY instead of pageY
+        }
+
+        autoMove.pause();
+        manualMovementTimeout.restart();
+    };
+
+    let resting = true;
+    const applyRestingVisuals = () => {
+        utils.set(creatureEl, {
+            width: `${rows * 10}em`,
+            height: `${rows * 10}em`,
+        });
+
+        utils.set(particleDivs, {
+            x: viewport.w / 2,
+            y: 0,
+            scale: 1,
+            opacity: 1,
+            background: '#fff',
+            boxShadow: 0,
+            onLoop: () => {},
+            onBegin: () => {},
+        });
+    };
+
+    const setRestingState = () => {
+        mainLoop.pause();
+        autoMove.pause();
+
+        // If there's a pulse animation running, let it complete naturally
+        // The onComplete callback will apply resting visuals
+        if (!currentPulseAnimation) {
+            // No pulse running, apply resting state immediately
+            applyRestingVisuals();
+        }
+        // If pulse is running, it will apply resting visuals when it completes
+    };
+
+    // Listen for creature toggle events from the header button
+    window.addEventListener('creature-toggle', (event: any) => {
+        const isActive = event.detail.active;
+
+        if (isActive && resting) {
+            // Turn on creature
+            resting = false;
+            autoMove.play();
+            mainLoop.play();
+        } else if (!isActive && !resting) {
+            // Turn off creature
+            resting = true;
+            setRestingState();
+        }
+    });
+
+    // Set initial state - creature starts active by default
+    if (resting) {
+        setRestingState();
+    }
+
+    document.addEventListener('mousemove', followPointer);
+    document.addEventListener('touchmove', followPointer);
+</script>
+
+<div id="creature-viewer">
+    <div id="creature">
+        <!-- <div id="debugging-block">a</div> -->
+    </div>
+</div>
+
+<style>
+    @reference "tailwindcss";
+
+    :global(div.creature-part) {
+        &:before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background-color: pink;
+        }
+        transform-style: preserve-3d;
+        position: relative;
+        width: 4em;
+        height: 4em;
+        margin: 3em;
+        border-radius: 2em;
+        will-change: transform;
+        background: var(--color-primary);
+        mix-blend-mode: plus-lighter;
+    }
+
+    #creature-viewer {
+        display: flex;
+        justify-content: start;
+        align-items: start;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100dvh;
+        padding: 1em;
+        z-index: 99999;
+        overflow: hidden;
+        pointer-events: none; /* Allow clicks to pass through to underlying content */
+    }
+
+    #creature {
+        font-size: .06vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        position: absolute;
+        top: 4rem;
+        left: 0;
+        pointer-events: none; /* Creature parts don't intercept clicks */
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        #creature-viewer {
+            display: none !important;
+        }
+    }
+</style>

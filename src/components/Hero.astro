@@ -1,0 +1,25 @@
+---
+import siteConfig from '../data/site-config.ts';
+
+
+const my = siteConfig.my;
+const socialLinks = siteConfig.socialLinks || [];
+
+---
+
+{
+    (my?.name || my?.shortBio) && (
+        <>
+            <section class="px-4 py-12 relative sm:px-8 sm:py-16 bg-[var(--backgroundColor)]">
+                <div class="w-full max-w-3xl mx-auto flex flex-col items-start
+                text-center">
+                    {my?.name && <h6 class:list={['rounded-md bg-primary text-slate-900 py-0.5 px-2.5 border border-transparent text-sm font-extrabold uppercase transition-all']}>{my?.salutation}</h1>}
+                    {my?.name && <h1 class:list={['text-4xl font-bold sm:text-5xl mt-2']}>{my?.name}</h1>}
+                    {my?.shortBio && (
+                        <p class:list={['sm:text-lg mt-6 text-left max-w-md']}>{my?.shortBio}</p>
+                    )}
+                </div>
+            </section>
+        </>
+    )
+}

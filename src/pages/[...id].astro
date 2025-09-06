@@ -1,0 +1,54 @@
+---
+import { Image } from 'astro:assets';
+import { type CollectionEntry, getCollection, render } from 'astro:content';
+import { type Image as ImageType } from '../data/site-config';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+    const pages = await getCollection('pages');
+    return pages.map((page) => {
+        return {
+            params: { id: page.id },
+            props: { page }
+        };
+    });
+}
+
+const { page } = Astro.props as { page: CollectionEntry<'pages'> };
+const { title, featureImage, seo } = page.data;
+const { Content } = await render(page);
+let socialImage: ImageType | undefined;
+if (featureImage?.src) {
+    socialImage = featureImage;
+}
+if (seo?.image?.src) {
+    socialImage = seo.image;
+}
+---
+
+<BaseLayout title={seo?.title ?? title} description={seo?.description} image={socialImage}>
+    <main class="grow px-4 py-12 sm:px-8 sm:py-16">
+        <article class="mx-auto">
+            <header class="max-w-3xl mx-auto mb-9">
+                <h1 class="text-slate-900 text-4xl sm:text-5xl font-bold">{title}</h1>
+            </header>
+            {
+                featureImage?.src && (
+                    <figure class="mx-auto mb-9">
+                        {featureImage.src.startsWith('/') ? (
+                            <img src={featureImage.src} loading="lazy" decoding="async" alt={featureImage.alt || ''} class="w-full rounded-md" />
+                        ) : (
+                            <Image src={featureImage.src} loading="lazy" decoding="async" alt={featureImage.alt || ''} class="w-full rounded-md" inferSize />
+                        )}
+                        {featureImage.caption && <figcaption class="text-xs mt-1.5">{featureImage.caption}</figcaption>}
+                    </figure>
+                )
+            }
+            <div class="max-w-3xl mx-auto">
+                <div class="prose sm:prose-lg max-w-none">
+                    <Content />
+                </div>
+            </div>
+        </article>
+    </main>
+</BaseLayout>

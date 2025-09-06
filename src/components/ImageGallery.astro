@@ -1,0 +1,154 @@
+---
+import { Image } from 'astro:assets';
+
+export interface Props {
+  images: Array<{
+    src: string;
+    alt: string;
+  }>;
+  columns?: number;
+  height?: string;
+}
+
+const { images, columns = 3, height = 'auto' } = Astro.props;
+---
+
+<div class="image-gallery not-prose">
+  <div class="masonry-grid" style={`--columns: ${columns}; --height: ${height};`}>
+    {images.map((image, index) => (
+      <div class="masonry-item">
+        {image.src.startsWith('/') ? (
+          <img
+            src={image.src}
+            alt={image.alt}
+            class="gallery-image cursor-pointer rounded-md hover:opacity-90 transition-opacity"
+            data-index={index}
+          />
+        ) : (
+          <Image
+            src={image.src}
+            alt={image.alt}
+            class="gallery-image cursor-pointer rounded-md hover:opacity-90 transition-opacity"
+            data-index={index}
+            inferSize
+          />
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="image-modal" class="modal hidden fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center p-4">
+  <div class="modal-content relative w-full h-full flex items-center justify-center">
+    <button
+      id="close-modal"
+      class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 z-10 bg-[#00000099] bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center"
+    >
+      ✕
+    </button>
+    <img id="modal-image" src="" alt="" class="max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)] object-contain rounded-md" />
+  </div>
+</div>
+
+<style>
+  .masonry-grid {
+    columns: var(--columns, 3);
+    column-gap: 1rem;
+    height: var(--height, auto);
+    margin: 2rem 0;
+  }
+
+  .masonry-item {
+    break-inside: avoid;
+    margin-bottom: 1rem;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .gallery-image {
+    width: 100%;
+    display: block;
+  }
+
+  @media (max-width: 767px) {
+    .masonry-grid {
+      columns: min(var(--columns, 3), 2);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .masonry-grid {
+      columns: 1;
+    }
+  }
+
+  .modal {
+    backdrop-filter: blur(4px);
+  }
+</style>
+
+<script>
+  function initImageGallery() {
+    const modal = document.getElementById('image-modal');
+    const modalImage = document.getElementById('modal-image');
+    const closeButton = document.getElementById('close-modal');
+    const galleryImages = document.querySelectorAll('.gallery-image');
+
+    if (!modal || !modalImage || !closeButton) return;
+
+    // Remove existing event listeners to prevent duplicates
+    galleryImages.forEach((img) => {
+      const newImg = img.cloneNode(true);
+      img.parentNode?.replaceChild(newImg, img);
+    });
+
+    // Re-query after cloning
+    const freshGalleryImages = document.querySelectorAll('.gallery-image');
+
+    // Open modal when image is clicked
+    freshGalleryImages.forEach((img) => {
+      img.addEventListener('click', () => {
+        const imageSrc = img.getAttribute('src');
+        const imageAlt = img.getAttribute('alt');
+
+        modalImage.setAttribute('src', imageSrc || '');
+        modalImage.setAttribute('alt', imageAlt || '');
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    // Close modal
+    const closeModal = () => {
+      modal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    };
+
+    // Remove existing listeners and add new ones
+    const newCloseButton = closeButton.cloneNode(true);
+    closeButton.parentNode?.replaceChild(newCloseButton, closeButton);
+
+    newCloseButton.addEventListener('click', closeModal);
+
+    // Close modal when clicking outside the image
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initImageGallery);
+
+  // Re-initialize after Astro view transitions
+  document.addEventListener('astro:after-swap', initImageGallery);
+</script>
